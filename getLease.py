@@ -84,20 +84,39 @@ print("links: " + str(len(links)))
 
 oldVapeShops = []
 currentdir = os.getcwd()
-filename = os.path.join(currentdir, 'oldVapeShops.txt')
-with open(filename, 'r') as f:
+old_filename = os.path.join(currentdir, 'oldVapeShops.txt')
+current_filename = os.path.join(currentdir, 'currentVapeShops.txt')
+currentVapeShops = []
+#check if oldVapeShops.txt exists
+if os.path.isfile(old_filename):
+    print("oldVapeShops.txt exists")
+else:
+    print("oldVapeShops.txt does not exist")
+    with open(old_filename, 'w') as f:
+        f.write("")
+    print("oldVapeShops.txt created")
+#check if currentVapeShops.txt exists
+if os.path.isfile(current_filename):
+    print("currentVapeShops.txt exists")
+else:
+    print("currentVapeShops.txt does not exist")
+    with open(current_filename, 'w') as f:
+        f.write("")
+    print("currentVapeShops.txt created")
+
+with open(old_filename, 'r') as f:
     for line in f:
         oldVapeShops.append(line)
+    
 
-
+#add every link that is not in oldVapeShops to currentVapeShops
 for link in links:
-    if link in oldVapeShops:
-        continue
-    else:
-        with open(filename, 'a') as f:
-            f.write(str(link) + '\n')
-    print(link)
-    addresses.append(link.replace('\n', ''))
+    if link not in oldVapeShops:
+        currentVapeShops.append(link)
+#write currentVapeShops to currentVapeShops.txt
+with open(current_filename, 'a') as f:
+    for link in currentVapeShops:
+        f.write(link + "\n")
 
 
 
