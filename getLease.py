@@ -1,5 +1,5 @@
 
-from openpyxl import load_workbook
+
 from selenium import webdriver
 import time
 import sys
@@ -17,10 +17,10 @@ import os
 #start headless chrome
 options = webdriver.ChromeOptions()
 #options.add_argument('headless')
-driver = webdriver.Chrome(options=options)
+chrome_path = os.path.join(os.getcwd(), 'chromedriver')
+driver = webdriver.Chrome(chrome_path, chrome_options=options)
 
-username = 'thomassafar03@gmail.com'
-password = 'eatit093'
+
 pages = [
     "https://www.crexi.com/lease/properties?sqFtMax=3000&sqFtMin=0&types%5B%5D=Retail&sort=New%20Listings&placeIds%5B%5D=ChIJ66_O8Ra35YgR4sf8ljh9zcQ",
     "https://www.crexi.com/lease/properties?sqFtMax=3000&sqFtMin=0&types%5B%5D=Retail&sort=New%20Listings&placeIds%5B%5D=ChIJr46dPFY25IgRVZvncDr516U",
@@ -47,20 +47,7 @@ try:
     driver.execute_script("document.getElementsByClassName('cui-modal-close ng-star-inserted')[0].click()")
 except:
     pass
-#click login
-driver.execute_script('document.querySelector("body > crx-app > div > ng-component > crx-normal-page > div > crx-header > crx-header-content > div > div.transclude-auth.right-header-section > crx-logged-out-header > button").click()')
-time.sleep(2)
-#click login tab
-driver.execute_script("document.getElementsByClassName('tab switch')[0].click()")
-time.sleep(2)
-emailBox = driver.execute_script('return document.querySelector("#login-form > div:nth-child(1) > label > input")')
-emailBox.send_keys(username)
-passwordBox = driver.execute_script('return document.querySelector("#login-form > div:nth-child(2) > label > input")')
-passwordBox.send_keys(password)
-time.sleep(2)
-#finally click login
-driver.execute_script('document.querySelector("#login-form > button").click()')
-time.sleep(5)
+
 i=0
 links = []
 for i in range(0, len(pages)):
