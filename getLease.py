@@ -13,6 +13,9 @@ import random
 import datetime
 import string
 import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 #start headless chrome
 options = webdriver.ChromeOptions()
@@ -85,45 +88,72 @@ print("links: " + str(len(links)))
 oldVapeShops = []
 currentdir = os.getcwd()
 old_filename = os.path.join(currentdir, 'oldVapeShops.txt')
-current_filename = os.path.join(currentdir, 'currentVapeShops.txt')
 currentVapeShops = []
 #check if oldVapeShops.txt exists
-if os.path.isfile(old_filename):
-    print("oldVapeShops.txt exists")
-else:
+try:
+    with open(old_filename, 'r') as f:
+        for line in f:
+            oldVapeShops.append(line.replace('\n', ''))
+    print("Old shops: ", oldVapeShops)
+
+except:
     print("oldVapeShops.txt does not exist")
     with open(old_filename, 'w') as f:
         f.write("")
     print("oldVapeShops.txt created")
-#check if currentVapeShops.txt exists
-if os.path.isfile(current_filename):
-    print("currentVapeShops.txt exists")
-else:
-    print("currentVapeShops.txt does not exist")
-    with open(current_filename, 'w') as f:
-        f.write("")
-    print("currentVapeShops.txt created")
 
-with open(old_filename, 'r') as f:
-    for line in f:
-        oldVapeShops.append(line)
-    
-
+print("oldVapeShops.txt length: " + str(len(oldVapeShops)))
+#remove duplicates from oldVapeShops
+oldVapeShops = list(dict.fromkeys(oldVapeShops))
+print("oldVapeShops.txt length after removing duplicates: " + str(len(oldVapeShops)))
 #add every link that is not in oldVapeShops to currentVapeShops
 for link in links:
     if link not in oldVapeShops:
         currentVapeShops.append(link)
-#write currentVapeShops to currentVapeShops.txt
-with open(current_filename, 'a') as f:
-    for link in currentVapeShops:
-        f.write(link + "\n")
+ 
+print("New shops: ", currentVapeShops)
 
-
-
-
+#add every link in currentVapeShops to oldVapeShops
+f = open(old_filename, 'w')
+for link in oldVapeShops + currentVapeShops:
+    f.write(link + "\n")
 
 
 #close the driver
 print("closing driver")
 driver.close()
+print('new shops: ' + str(len(currentVapeShops)))
 
+# Replace these with your Gmail account credentials
+gmail_user = 'torinsappail@gmail.com'
+gmail_password = 'igtxbqpahhukdoxf'
+
+# Replace these with the recipient's email address and the email subject
+to = 'thomassafar03@gmail.com'
+subject = 'Subject of the email'
+#seperate each link with a new line
+body = ''
+for link in currentVapeShops:
+    body += link + "\n"
+
+# Create the email
+msg = MIMEMultipart()
+msg['From'] = gmail_user
+msg['To'] = to
+msg['Subject'] = subject
+msg.attach(MIMEText(body, 'plain'))
+
+# Send the email
+try:
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        if len(currentVapeShops) > 0:
+            server.sendmail(gmail_user, to, msg.as_string())
+        server.quit()
+
+    print('Email sent!')
+except Exception as e:
+    print('Something went wrong...', e)
